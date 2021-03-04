@@ -38,7 +38,7 @@ func dialEcho2(port int, fullEncrypt bool) (*UDPSession, error) {
 	//block, _ := NewTEABlockCrypt(pass[:16])
 	//block, _ := NewAESBlockCrypt(pass)
 	block, _ := NewSalsa20BlockCrypt(pass)
-	sess, err := DialWithOptions(fmt.Sprintf("127.0.0.1:%v", port), block, 10, 3, fullEncrypt)
+	sess, err := DialWithOptions(fmt.Sprintf("127.0.0.1:%v", port), block, 10, 3, fullEncrypt, defaultKCPOptions)
 	if err != nil {
 		panic(err)
 	}
@@ -61,7 +61,7 @@ func dialEcho2(port int, fullEncrypt bool) (*UDPSession, error) {
 }
 
 func dialSink(port int) (*UDPSession, error) {
-	sess, err := DialWithOptions(fmt.Sprintf("127.0.0.1:%v", port), nil, 0, 0, true)
+	sess, err := DialWithOptions(fmt.Sprintf("127.0.0.1:%v", port), nil, 0, 0, true, defaultKCPOptions)
 	if err != nil {
 		panic(err)
 	}
@@ -84,7 +84,7 @@ func dialTinyBufferEcho(port int) (*UDPSession, error) {
 	//block, _ := NewTEABlockCrypt(pass[:16])
 	//block, _ := NewAESBlockCrypt(pass)
 	block, _ := NewSalsa20BlockCrypt(pass)
-	sess, err := DialWithOptions(fmt.Sprintf("127.0.0.1:%v", port), block, 10, 3, true)
+	sess, err := DialWithOptions(fmt.Sprintf("127.0.0.1:%v", port), block, 10, 3, true, defaultKCPOptions)
 	if err != nil {
 		panic(err)
 	}
@@ -102,7 +102,7 @@ func listenEcho2(port int, fullEncrypt bool) (net.Listener, error) {
 	//block, _ := NewTEABlockCrypt(pass[:16])
 	//block, _ := NewAESBlockCrypt(pass)
 	block, _ := NewSalsa20BlockCrypt(pass)
-	return ListenWithOptions(fmt.Sprintf("127.0.0.1:%v", port), block, 10, 3, fullEncrypt)
+	return ListenWithOptions(fmt.Sprintf("127.0.0.1:%v", port), block, 10, 3, fullEncrypt, defaultKCPOptions)
 }
 
 func listenTinyBufferEcho(port int) (net.Listener, error) {
@@ -111,11 +111,11 @@ func listenTinyBufferEcho(port int) (net.Listener, error) {
 	//block, _ := NewTEABlockCrypt(pass[:16])
 	//block, _ := NewAESBlockCrypt(pass)
 	block, _ := NewSalsa20BlockCrypt(pass)
-	return ListenWithOptions(fmt.Sprintf("127.0.0.1:%v", port), block, 10, 3, true)
+	return ListenWithOptions(fmt.Sprintf("127.0.0.1:%v", port), block, 10, 3, true, defaultKCPOptions)
 }
 
 func listenSink(port int) (net.Listener, error) {
-	return ListenWithOptions(fmt.Sprintf("127.0.0.1:%v", port), nil, 0, 0, true)
+	return ListenWithOptions(fmt.Sprintf("127.0.0.1:%v", port), nil, 0, 0, true, defaultKCPOptions)
 }
 
 func echoServer(port int) net.Listener {
@@ -580,7 +580,7 @@ func TestSNMP(t *testing.T) {
 
 func TestListenerClose(t *testing.T) {
 	port := int(atomic.AddUint32(&baseport, 1))
-	l, err := ListenWithOptions(fmt.Sprintf("127.0.0.1:%v", port), nil, 10, 3, true)
+	l, err := ListenWithOptions(fmt.Sprintf("127.0.0.1:%v", port), nil, 10, 3, true, defaultKCPOptions)
 	if err != nil {
 		t.Fail()
 	}
@@ -618,7 +618,7 @@ func newClosedFlagPacketConn(c net.PacketConn) *closedFlagPacketConn {
 // https://github.com/xtaci/kcp-go/issues/165
 func TestListenerOwnedPacketConn(t *testing.T) {
 	// ListenWithOptions creates its own net.PacketConn.
-	l, err := ListenWithOptions("127.0.0.1:0", nil, 0, 0, true)
+	l, err := ListenWithOptions("127.0.0.1:0", nil, 0, 0, true, defaultKCPOptions)
 	if err != nil {
 		panic(err)
 	}
@@ -654,7 +654,7 @@ func TestListenerNonOwnedPacketConn(t *testing.T) {
 	// Make it remember when it has been closed.
 	pconn := newClosedFlagPacketConn(c)
 
-	l, err := ServeConn(nil, 0, 0, pconn, true)
+	l, err := ServeConn(nil, 0, 0, pconn, true, defaultKCPOptions)
 	if err != nil {
 		panic(err)
 	}
@@ -681,7 +681,7 @@ func TestUDPSessionOwnedPacketConn(t *testing.T) {
 	defer l.Close()
 
 	// DialWithOptions creates its own net.PacketConn.
-	client, err := DialWithOptions(l.Addr().String(), nil, 0, 0, true)
+	client, err := DialWithOptions(l.Addr().String(), nil, 0, 0, true, defaultKCPOptions)
 	if err != nil {
 		panic(err)
 	}
@@ -720,7 +720,7 @@ func TestUDPSessionNonOwnedPacketConn(t *testing.T) {
 	// Make it remember when it has been closed.
 	pconn := newClosedFlagPacketConn(c)
 
-	client, err := NewConn2(l.Addr(), nil, 0, 0, pconn, true)
+	client, err := NewConn2(l.Addr(), nil, 0, 0, pconn, true, defaultKCPOptions)
 	if err != nil {
 		panic(err)
 	}
