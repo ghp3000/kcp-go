@@ -403,7 +403,7 @@ func (kcp *KCP) update_ack(rtt int32) {
 	}
 	rto = uint32(kcp.rx_srtt) + _imax_(kcp.interval, uint32(kcp.rx_rttvar)<<2)
 	kcp.rx_rto = _ibound_(kcp.rx_minrto, rto, IKCP_RTO_MAX)
-	kcp.initial_tx_rto = _ibound_(kcp.rx_rto, rto+(rto>>kcp.options.InitialTXRTOBackoff), IKCP_RTO_MAX) // initial tx RTO back off, it is vital to avoid unnecessary retransmit
+	kcp.initial_tx_rto = _ibound_(kcp.rx_rto, rto+(rto>>kcp.options.InitialTXRTOBackoff), IKCP_RTO_MAX) // initial tx RTO backoff, it is vital to avoid unnecessary retransmit
 }
 
 func (kcp *KCP) shrink_buf() {
