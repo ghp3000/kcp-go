@@ -2,12 +2,12 @@ package main
 
 import (
 	"crypto/sha1"
+	"github.com/ghp3000/kcp-go"
+	"golang.org/x/crypto/pbkdf2"
 	"io"
 	"log"
 	"math"
 	"time"
-
-	"golang.org/x/crypto/pbkdf2"
 )
 
 func main() {
