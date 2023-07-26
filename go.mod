@@ -1,6 +1,7 @@
 module github.com/ghp3000/kcp-go
 
 require (
+	github.com/golang/snappy v0.0.4
 	github.com/klauspost/cpuid/v2 v2.2.5 // indirect
 	github.com/klauspost/reedsolomon v1.11.8
 	github.com/pkg/errors v0.9.1
