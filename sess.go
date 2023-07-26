@@ -251,6 +251,11 @@ func (s *UDPSession) Read(b []byte) (n int, err error) {
 			delay := time.Until(s.rd)
 			timeout = time.NewTimer(delay)
 			c = timeout.C
+			defer func() {
+				if timeout != nil {
+					timeout.Stop()
+				}
+			}()
 		}
 		s.mu.Unlock()
 
@@ -322,6 +327,11 @@ func (s *UDPSession) WriteBuffers(v [][]byte) (n int, err error) {
 			delay := time.Until(s.wd)
 			timeout = time.NewTimer(delay)
 			c = timeout.C
+			defer func() {
+				if timeout != nil {
+					timeout.Stop()
+				}
+			}()
 		}
 		s.mu.Unlock()
 
